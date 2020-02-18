@@ -1,6 +1,7 @@
 const fs = require('fs');
 const util = require('util');
 const path = require('path');
+const uuidv4 = require('uuid/v4');
 
 const GRID_SIZE = 4;
 const readFile = util.promisify(fs.readFile);
@@ -182,13 +183,20 @@ const wordSearch = (boardState, word, wordIndex, currentRow, currentColumn) => {
   return isWordFound;
 };
 
+const generateToken = () => {
+  const token = uuidv4();
+
+  return token;
+};
+
 module.exports = {
   generateDefaultBoard,
   generateRandomBoard,
   isValidBoard,
   createBoardState,
   isValidEnglishWord,
-  isLegalMove
+  isLegalMove,
+  generateToken
 };
 
 // console.log(createBoardState(generateRandomBoard()));
