@@ -35,3 +35,22 @@ const generateRandomBoard = () => {
 
   return boardData.trim();
 };
+
+const createBoardState = board => {
+  const boardData = board.split(', ');
+
+  const boardState = [];
+  let currentRow = [];
+
+  for (let i = 0; i < boardData.length; i++) {
+    let currentCharacter = boardData[i];
+    currentRow.push(currentCharacter);
+
+    if (i % GRID_SIZE === GRID_SIZE - 1) {
+      boardState.push(currentRow);
+      currentRow = [];
+    }
+  }
+
+  return boardState;
+};
