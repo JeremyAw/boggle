@@ -77,7 +77,6 @@ const isValidEnglishWord = async word => {
   }
 };
 
-isValidEnglishWord('library');
 const isLegalMove = (boardState, word) => {
   const startingPoint = word[0];
   let isLegal = false;
