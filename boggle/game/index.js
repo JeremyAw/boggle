@@ -54,3 +54,27 @@ const createBoardState = board => {
 
   return boardState;
 };
+
+const isValidEnglishWord = async word => {
+  try {
+    const fileData = await readFile(
+      path.join(__dirname, './dictionary.txt'),
+      'utf8'
+    );
+
+    const dictionaryArray = fileData.split(/\n/);
+    let isValid;
+
+    if (dictionaryArray.indexOf(word) === -1) {
+      isValid = false;
+    } else {
+      isValid = true;
+    }
+
+    return isValid;
+  } catch (error) {
+    throw error;
+  }
+};
+
+isValidEnglishWord('library');
