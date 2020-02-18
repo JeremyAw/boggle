@@ -4,32 +4,38 @@ const GRID_SIZE = 4;
 const createGame = async (req, res) => {
   const { duration, random, board } = req.body;
   let boardData;
-
-  if (random) {
-    boardData = utility.generateRandomBoard();
-  } else {
-    if (board == null || board == undefined) {
-      boardData = await utility.generateDefaultBoard();
+  try {
+    if (random) {
+      boardData = utility.generateRandomBoard();
     } else {
-      if (utility.isValidBoard(board)) {
-        boardData = board;
+      // Use default board if user did not provide custom board
+      if (board == null || board == undefined) {
+        boardData = await utility.generateDefaultBoard();
       } else {
-        res
-          .status(400)
-          .send(
-            `Invalid board given. Board must be a ${GRID_SIZE *
-              GRID_SIZE} character long, comma-separated string.`
-          );
+        // Check validity of custom board
+        if (utility.isValidBoard(board)) {
+          boardData = board;
+        } else {
+          res
+            .status(400)
+            .send(
+              `Invalid board given. Board must be a ${GRID_SIZE *
+                GRID_SIZE} character long, comma-separated string.`
+            );
+        }
       }
     }
+
+    const response = {
+      duration: duration,
+      board: boardData
+    };
+
+    res.status(201).send(response);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send('An error occurred while processing your request.');
   }
-
-  const response = {
-    duration: duration,
-    board: boardData
-  };
-
-  res.status(201).send(response);
 };
 
 module.exports = {

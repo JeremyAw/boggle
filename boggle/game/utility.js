@@ -14,6 +14,7 @@ const generateDefaultBoard = async () => {
 
     return boardData.trim();
   } catch (error) {
+    console.log(error);
     throw error;
   }
 };
