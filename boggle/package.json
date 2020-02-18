@@ -1,0 +1,25 @@
+{
+  "name": "boggle",
+  "version": "1.0.0",
+  "description": "Single-player Boggle API ",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JeremyAw/boggle.git"
+  },
+  "keywords": [
+    "boggle"
+  ],
+  "author": "Jeremy Aw",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/JeremyAw/boggle/issues"
+  },
+  "homepage": "https://github.com/JeremyAw/boggle#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
