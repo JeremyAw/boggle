@@ -190,6 +190,13 @@ const generateToken = () => {
   return token;
 };
 
+const generateTimeCreated = () => {
+  let time_created = new Date().getTime();
+  time_created = Math.floor(time_created / 1000);
+
+  return time_created;
+};
+
 module.exports = {
   generateDefaultBoard,
   generateRandomBoard,
@@ -197,7 +204,8 @@ module.exports = {
   createBoardState,
   isValidEnglishWord,
   isLegalMove,
-  generateToken
+  generateToken,
+  generateTimeCreated
 };
 
 // console.log(createBoardState(generateRandomBoard()));

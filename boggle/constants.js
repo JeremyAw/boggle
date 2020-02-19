@@ -1,7 +1,9 @@
 GRID_SIZE = 4;
 DATABASE_FILE = 'sample.db';
+STARTING_POINTS = 0;
 
 module.exports = {
   GRID_SIZE,
-  DATABASE_FILE
+  DATABASE_FILE,
+  STARTING_POINTS
 };

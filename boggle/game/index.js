@@ -29,9 +29,10 @@ const createGame = async (req, res) => {
     }
 
     const token = utility.generateToken();
-    let time_created = new Date().getTime();
-    time_created = Math.floor(time_created / 1000);
-    const points = 0;
+    // let time_created = new Date().getTime();
+    // time_created = Math.floor(time_created / 1000);
+    const time_created = utility.generateTimeCreated();
+    const points = constants.STARTING_POINTS;
 
     const response = {
       token: token,
