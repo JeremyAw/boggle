@@ -187,7 +187,10 @@ const wordSearch = (boardState, word, wordIndex, currentRow, currentColumn) => {
 const generateToken = () => {
   const token = uuidv4();
 
-  return token;
+  const regex = /-/g;
+  const strippedToken = token.replace(regex, '');
+
+  return strippedToken;
 };
 
 const generateTimeCreated = () => {
