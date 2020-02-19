@@ -200,6 +200,23 @@ const generateTimeCreated = () => {
   return time_created;
 };
 
+const authenticateGame = (inputToken, actualToken) => {
+  return inputToken === actualToken ? true : false;
+};
+
+const calculateScore = word => {
+  // Clarify whether score is length of word or actual boggle scoring system
+  return word.length;
+};
+
+const calculateTimeLeft = (timeCreated, duration) => {
+  const currentTime = generateTimeCreated();
+
+  return currentTime - timeCreated > duration
+    ? 0
+    : duration - (currentTime - timeCreated);
+};
+
 module.exports = {
   generateDefaultBoard,
   generateRandomBoard,
@@ -208,7 +225,10 @@ module.exports = {
   isValidEnglishWord,
   isLegalMove,
   generateToken,
-  generateTimeCreated
+  generateTimeCreated,
+  authenticateGame,
+  calculateScore,
+  calculateTimeLeft
 };
 
 // console.log(createBoardState(generateRandomBoard()));
