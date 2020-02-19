@@ -2,8 +2,9 @@ const fs = require('fs');
 const util = require('util');
 const path = require('path');
 const uuidv4 = require('uuid/v4');
+const constants = require('../constants.js');
 
-const GRID_SIZE = 4;
+const GRID_SIZE = constants.GRID_SIZE;
 const readFile = util.promisify(fs.readFile);
 
 const generateDefaultBoard = async () => {

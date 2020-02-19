@@ -1,7 +1,8 @@
 const utility = require('./utility');
 const db = require('../database/index.js');
+const constants = require('../constants.js');
 
-const GRID_SIZE = 4; //todo: shift constant to another file
+const GRID_SIZE = constants.GRID_SIZE;
 
 const createGame = async (req, res) => {
   const { duration, random } = req.body;
