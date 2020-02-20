@@ -8,6 +8,12 @@ const createGame = async (req, res) => {
   const { duration, random } = req.body;
   let { board } = req.body;
 
+  if (
+    !(req.body.hasOwnProperty('duration') && req.body.hasOwnProperty('random'))
+  ) {
+    return res.status(400).send(`Required parameters missing.`);
+  }
+
   try {
     if (random) {
       board = utility.generateRandomBoard();
@@ -62,6 +68,16 @@ const playGame = async (req, res) => {
   const { id, token, word } = req.body;
   let isAuthenticated = false;
 
+  if (
+    !(
+      req.body.hasOwnProperty('id') &&
+      req.body.hasOwnProperty('token') &&
+      req.body.hasOwnProperty('word')
+    )
+  ) {
+    return res.status(400).send(`Required parameters missing.`);
+  }
+
   try {
     let gameQuery = await db.fetchGameByID(id);
 
@@ -94,6 +110,10 @@ const playGame = async (req, res) => {
 
 const showGame = async (req, res) => {
   const { id } = req.body;
+
+  if (!req.body.hasOwnProperty('id')) {
+    return res.status(400).send(`Required parameters missing.`);
+  }
 
   try {
     const response = await db.fetchGameByID(id);
