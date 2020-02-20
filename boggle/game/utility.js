@@ -211,6 +211,7 @@ const executeMove = (gameQuery, word) => {
   const boardState = createBoardState(gameQuery.board);
   const isLegal = isLegalMove(boardState, word);
   const isValidWord = isValidEnglishWord(word);
+  response.status = false;
 
   if (isValidWord && isLegal) {
     response.points = calculateScore(word) + gameQuery.points;
@@ -218,10 +219,16 @@ const executeMove = (gameQuery, word) => {
       gameQuery.time_created,
       gameQuery.duration
     );
+
+    if (response.time_left <= 0) {
+      response.message = 'Game has expired.';
+      return response;
+    }
+
     response.status = true;
     return response;
   } else {
-    response.status = false;
+    response.message = 'Invalid move/word given.';
     return response;
   }
 };
