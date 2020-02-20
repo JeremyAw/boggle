@@ -103,11 +103,7 @@ const playGame = async (req, res) => {
 };
 
 const showGame = async (req, res) => {
-  const { id } = req.body;
-
-  if (!req.body.hasOwnProperty('id')) {
-    return res.status(400).send(`Required parameters missing.`);
-  }
+  const id = req.params.id;
 
   try {
     const response = await db.fetchGameByID(id);
