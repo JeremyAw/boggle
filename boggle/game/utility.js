@@ -111,9 +111,6 @@ const isLegalMove = (boardState, word) => {
         startingPoint.toUpperCase() === boardState[row][column] ||
         startingPoint === '*'
       ) {
-        // console.log(
-        //   `starting search here: ${boardState[row][column]} ${row} ${column}`
-        // );
         isLegal = wordSearch(boardState, word, 1, row, column);
       }
 
@@ -132,9 +129,6 @@ const isLegalMove = (boardState, word) => {
 };
 
 const wordSearch = (boardState, word, wordIndex, currentRow, currentColumn) => {
-  console.log(
-    `parameters: wordIndex: ${wordIndex}, currentRow: ${currentRow}, currentColumn:${currentColumn}`
-  );
   // Terminate when all characters in given word are found
   if (wordIndex === word.length) {
     return true;
@@ -146,12 +140,7 @@ const wordSearch = (boardState, word, wordIndex, currentRow, currentColumn) => {
   const columnStart = Math.max(0, currentColumn - 1);
   const columnEnd = Math.min(GRID_SIZE - 1, currentColumn + 1);
 
-  console.log(
-    `rowStart: ${rowStart}, rowEnd: ${rowEnd}, columnStart: ${columnStart}, columnEnd: ${columnEnd}`
-  );
-
   const characterToFind = word[wordIndex].toUpperCase();
-  console.log(`characterToFind: ${characterToFind}`);
   let isWordFound = false;
 
   // Search for next character in the 8 tiles surrounding the current character
@@ -205,7 +194,7 @@ const authenticateGame = (inputToken, actualToken) => {
 };
 
 const calculateScore = word => {
-  // Clarify whether score is length of word or actual boggle scoring system
+  // Clarified that scoring would be one point per character, instead of usual Boggle scoring system
   return word.length;
 };
 
@@ -215,6 +204,26 @@ const calculateTimeLeft = (timeCreated, duration) => {
   return currentTime - timeCreated > duration
     ? 0
     : duration - (currentTime - timeCreated);
+};
+
+const executeMove = (gameQuery, word) => {
+  const response = { ...gameQuery };
+  const boardState = createBoardState(gameQuery.board);
+  const isLegal = isLegalMove(boardState, word);
+  const isValidWord = isValidEnglishWord(word);
+
+  if (isValidWord && isLegal) {
+    response.points = calculateScore(word) + gameQuery.points;
+    response.time_left = calculateTimeLeft(
+      gameQuery.time_created,
+      gameQuery.duration
+    );
+    response.status = true;
+    return response;
+  } else {
+    response.status = false;
+    return response;
+  }
 };
 
 module.exports = {
@@ -228,16 +237,6 @@ module.exports = {
   generateTimeCreated,
   authenticateGame,
   calculateScore,
-  calculateTimeLeft
+  calculateTimeLeft,
+  executeMove
 };
-
-// console.log(createBoardState(generateRandomBoard()));
-// const dummyData = [
-//   ['S', 'K', 'A', 'K'],
-//   ['Z', 'V', '*', 'Y'],
-//   ['D', 'E', 'R', 'S'],
-//   ['A', 'B', 'I', 'M']
-// ];
-// console.log(dummyData);
-
-// console.log(isLegalMove(dummyData, 'sktsi'));

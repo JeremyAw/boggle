@@ -29,8 +29,6 @@ const createGame = async (req, res) => {
     }
 
     const token = utility.generateToken();
-    // let time_created = new Date().getTime();
-    // time_created = Math.floor(time_created / 1000);
     const time_created = utility.generateTimeCreated();
     const points = constants.STARTING_POINTS;
 
@@ -61,6 +59,54 @@ const createGame = async (req, res) => {
   }
 };
 
+const playGame = async (req, res) => {
+  const { id, token, word } = req.body;
+  let isAuthenticated = false;
+
+  try {
+    let gameQuery = await db.fetchGameByID(id);
+
+    // Authenticate game
+    isAuthenticated = utility.authenticateGame(token, gameQuery.token);
+    if (!isAuthenticated) {
+      return res.status(401).send('Incorrect ID/token provided.');
+    }
+
+    // Execute move
+    const response = utility.executeMove(gameQuery, word);
+    if (response.status) {
+      // Update points
+      await db.updateGameByID(id, response.points);
+
+      // Remove unncessary properties
+      delete response.status;
+      delete response.time_created;
+      return res.status(200).send(response);
+    } else {
+      return res.status(400).send('Invalid move/word given.');
+    }
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .send('An error occurred while processing your request.');
+  }
+
+  //   db.serialize(() => {
+
+  // Update points
+  // const updateSQL = `UPDATE boggle_games SET points = ? WHERE id = ? AND token = ?`;
+  //   const updateParams = [updatedPoints, id, token];
+  //   db.run(updateSQL, updateParams, function(error) {
+  //     if (error) {
+  //       console.log(`Error occurred updating boggle_games table: ${error}`);
+  //       throw error;
+  //     }
+  //     console.log(`Row(s) updated: ${this.changes}`);
+  //   });
+};
+
 module.exports = {
-  createGame
+  createGame,
+  playGame
 };
