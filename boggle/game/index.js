@@ -65,21 +65,15 @@ const createGame = async (req, res) => {
 };
 
 const playGame = async (req, res) => {
-  const { id, token, word } = req.body;
+  const { token, word } = req.body;
   let isAuthenticated = false;
 
-  if (
-    !(
-      req.body.hasOwnProperty('id') &&
-      req.body.hasOwnProperty('token') &&
-      req.body.hasOwnProperty('word')
-    )
-  ) {
+  if (!(req.body.hasOwnProperty('token') && req.body.hasOwnProperty('word'))) {
     return res.status(400).send(`Required parameters missing.`);
   }
 
   try {
-    let gameQuery = await db.fetchGameByID(id);
+    let gameQuery = await db.fetchGameByID(req.params.id);
 
     // Authenticate game
     isAuthenticated = utility.authenticateGame(token, gameQuery.token);
@@ -91,7 +85,7 @@ const playGame = async (req, res) => {
     const response = utility.executeMove(gameQuery, word);
     if (response.status) {
       // Update points
-      await db.updateGameByID(id, response.points);
+      await db.updateGameByID(req.params.id, response.points);
 
       // Remove unncessary properties
       delete response.status;
