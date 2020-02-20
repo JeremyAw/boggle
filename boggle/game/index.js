@@ -11,7 +11,7 @@ const createGame = async (req, res) => {
   if (
     !(req.body.hasOwnProperty('duration') && req.body.hasOwnProperty('random'))
   ) {
-    return res.status(400).send(`Required parameters missing.`);
+    return res.status(400).send({ message: `Required parameters missing.` });
   }
 
   try {
@@ -24,12 +24,10 @@ const createGame = async (req, res) => {
       } else {
         // Check validity of custom board
         if (!utility.isValidBoard(board)) {
-          return res
-            .status(400)
-            .send(
-              `Invalid board given. Board must be a ${GRID_SIZE *
-                GRID_SIZE} character long, comma-separated string.`
-            );
+          return res.status(400).send({
+            message: `Invalid board given. Board must be a ${GRID_SIZE *
+              GRID_SIZE} character long, comma-separated string.`
+          });
         }
       }
     }
@@ -60,7 +58,7 @@ const createGame = async (req, res) => {
     console.log(error);
     return res
       .status(500)
-      .send('An error occurred while processing your request.');
+      .send({ message: 'An error occurred while processing your request.' });
   }
 };
 
@@ -69,7 +67,7 @@ const playGame = async (req, res) => {
   let isAuthenticated = false;
 
   if (!(req.body.hasOwnProperty('token') && req.body.hasOwnProperty('word'))) {
-    return res.status(400).send(`Required parameters missing.`);
+    return res.status(400).send({ message: `Required parameters missing.` });
   }
 
   try {
@@ -92,13 +90,13 @@ const playGame = async (req, res) => {
       delete response.time_created;
       return res.status(200).send(response);
     } else {
-      return res.status(400).send('Invalid move/word given.');
+      return res.status(400).send(response);
     }
   } catch (error) {
     console.log(error);
     return res
       .status(500)
-      .send('An error occurred while processing your request.');
+      .send({ message: 'An error occurred while processing your request.' });
   }
 };
 
@@ -107,6 +105,9 @@ const showGame = async (req, res) => {
 
   try {
     const response = await db.fetchGameByID(id);
+    if (id <= 0 || response == undefined) {
+      return res.status(404).send({ message: 'Requested game not found.' });
+    }
 
     // Prepare response
     const timeLeft = utility.calculateTimeLeft(
@@ -121,7 +122,7 @@ const showGame = async (req, res) => {
     console.log(error);
     return res
       .status(500)
-      .send('An error occurred while processing your request.');
+      .send({ message: 'An error occurred while processing your request.' });
   }
 };
 
