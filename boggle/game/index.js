@@ -92,7 +92,31 @@ const playGame = async (req, res) => {
   }
 };
 
+const showGame = async (req, res) => {
+  const { id } = req.body;
+
+  try {
+    const response = await db.fetchGameByID(id);
+
+    // Prepare response
+    const timeLeft = utility.calculateTimeLeft(
+      response.time_created,
+      response.duration
+    );
+    response.time_left = timeLeft;
+    delete response.time_created;
+
+    res.status(200).send(response);
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .send('An error occurred while processing your request.');
+  }
+};
+
 module.exports = {
   createGame,
-  playGame
+  playGame,
+  showGame
 };
