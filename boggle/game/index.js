@@ -28,29 +28,28 @@ const createGame = async (req, res) => {
       }
     }
 
+    // Initialize new game data
     const token = utility.generateToken();
     const time_created = utility.generateTimeCreated();
     const points = constants.STARTING_POINTS;
 
+    const id = await db.insertGame(
+      token,
+      duration,
+      board,
+      time_created,
+      points
+    );
+
+    // Prepare response
     const response = {
+      id: id,
       token: token,
       duration: duration,
       board: board
     };
 
-    const insertSQL = 'INSERT INTO boggle_games VALUES (?, ?, ?, ?, ?, ?)';
-    const insertParams = [null, token, duration, board, time_created, points];
-    db.run(insertSQL, insertParams, function(error) {
-      if (error) {
-        console.log(
-          `Error occurred inserting new game into boggle_games table: ${error}`
-        );
-        throw error;
-      }
-
-      response.id = this.lastID;
-      return res.status(201).send(response);
-    });
+    return res.status(201).send(response);
   } catch (error) {
     console.log(error);
     return res
@@ -91,19 +90,6 @@ const playGame = async (req, res) => {
       .status(500)
       .send('An error occurred while processing your request.');
   }
-
-  //   db.serialize(() => {
-
-  // Update points
-  // const updateSQL = `UPDATE boggle_games SET points = ? WHERE id = ? AND token = ?`;
-  //   const updateParams = [updatedPoints, id, token];
-  //   db.run(updateSQL, updateParams, function(error) {
-  //     if (error) {
-  //       console.log(`Error occurred updating boggle_games table: ${error}`);
-  //       throw error;
-  //     }
-  //     console.log(`Row(s) updated: ${this.changes}`);
-  //   });
 };
 
 module.exports = {

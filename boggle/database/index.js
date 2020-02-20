@@ -23,6 +23,24 @@ let db = new sqlite3.Database(
     );
   }
 });
+
+const insertGame = (token, duration, board, timeCreated, points) => {
+  return new Promise((resolve, reject) => {
+    const insertSQL = `INSERT INTO boggle_games VALUES (?, ?, ?, ?, ?, ?)`;
+    const insertParams = [null, token, duration, board, timeCreated, points];
+    db.run(insertSQL, insertParams, function(error) {
+      if (error) {
+        console.log(
+          `Error occurred inserting new game into boggle_games table: ${error}`
+        );
+        reject();
+      }
+
+      resolve(this.lastID);
+    });
+  });
+};
+
 const fetchGameByID = gameID => {
   return new Promise((resolve, reject) => {
     const querySQL = `SELECT * FROM boggle_games WHERE id = ?`;
@@ -54,6 +72,7 @@ const updateGameByID = (gameID, updatedPoints) => {
 
 module.exports = {
   db,
+  insertGame,
   fetchGameByID,
   updateGameByID
 };
