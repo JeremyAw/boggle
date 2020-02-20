@@ -1,14 +1,19 @@
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
-const constants = require('../constants.js');
 
-let db = new sqlite3.Database(
-  path.join(__dirname, constants.DATABASE_FILE),
-  error => {
-    if (error) {
-      return console.error(error.message);
-    } else {
-      console.log('Connected to  SQLite database.');
+// Enable environment variables
+require('dotenv').config();
+
+const databaseFile =
+  process.env.NODE_ENV === 'production'
+    ? process.env.DATABASE_FILE_PRODUCTION
+    : process.env.DATABASE_FILE_DEVELOPMENT;
+
+let db = new sqlite3.Database(path.join(__dirname, databaseFile), error => {
+  if (error) {
+    return console.error(error.message);
+  } else {
+    console.log('Connected to  SQLite database.');
 
     // Create table if it doesn't exist
     db.run(

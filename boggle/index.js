@@ -15,5 +15,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/boggle', boggleRouter);
 
 app.listen(process.env.PORT, () => {
-  console.log(`Server started. Listening on port ${process.env.PORT}!`);
+  console.log(
+    `Server started on ${process.env.NODE_ENV} mode. Listening on port ${process.env.PORT}!`
+  );
 });
