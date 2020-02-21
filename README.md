@@ -49,6 +49,21 @@ All database related code goes here - initialization, connection and read/write/
 
 Each route will call a high-level method from boggle/game/index.js. All error handling and logic will be done here. Utility methods used to abstract the game logic will be placed separately in another utility file.
 
+## Solving Boggle
+
+There are three key components for this game.
+
+- Verifying if the word is a legal move
+
+  - I generated the board state using the board for that game before iterating through all 4x4 grids to run a DFS-like solution to check if the given word can be formed using the board.
+
+- Verifying if the word is a valid, English word
+
+  - I read from the dictionary.txt file to create an array of all possible English words. Then, I made use of the Javascript function .indexOf() to check if the given word exists in this array.
+
+- Verifying the game expiration time
+  - When the user creates a new game, I store the time it was created, rounded off to the nearest second. This will be used as the point of reference when calculating the time left whenever the user sends a PUT request to play the game. This will allow me to calculate the time left and check if the game is expired.
+
 ## Testing Approach
 
 I only did manual testing via playing using Postman, no test code was written. Tested scenarios are listed below with their respective message that was sent back in the response.
