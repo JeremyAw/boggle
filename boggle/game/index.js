@@ -72,15 +72,23 @@ const playGame = async (req, res) => {
 
   try {
     let gameQuery = await db.fetchGameByID(req.params.id);
+    if (gameQuery === undefined) {
+      return res
+        .status(401)
+        .send({ message: 'Invalid ID provided. Game does not exist.' });
+    }
 
     // Authenticate game
     isAuthenticated = utility.authenticateGame(token, gameQuery.token);
     if (!isAuthenticated) {
-      return res.status(401).send('Incorrect ID/token provided.');
+      return res
+        .status(401)
+        .send({ message: 'Authentication failed. Incorrect token provided.' });
     }
 
     // Execute move
     const response = utility.executeMove(gameQuery, word);
+
     if (response.status) {
       // Update points
       await db.updateGameByID(req.params.id, response.points);
@@ -90,6 +98,9 @@ const playGame = async (req, res) => {
       delete response.time_created;
       return res.status(200).send(response);
     } else {
+      // Remove unncessary properties
+      delete response.status;
+      delete response.time_created;
       return res.status(400).send(response);
     }
   } catch (error) {
