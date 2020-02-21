@@ -1,163 +1,130 @@
-## Background
+## Introduction
 
-Boggle is a word game that is played on a 4x4 board with 16 letter tiles.
-The goal is to find as many words as possible given a time constraint.
-For this exercise, we are making one modification.
-Now it is possible for one or more of the letter tiles to be blank (denoted by `*`).
-When a tile is blank, it can be treated as any other letter.
-Note that in one game it does not have to be the same character for each word.
-For example, if the tiles C, T, and * are adjacent. The words cot, cat,
-and cut can all be used.  You will be given a text file containing all
-valid English words (a dictionary). You will also be given an initial board
-configuration as a text file with commas separating the letters.
-Use this as a guide for how to set up the board.
+I decided to use Node.js to build the backend API due to the following reasons:
 
-For example, a file may contain:
+- Prior experience building APIs with Node.js
+- There are existing libraries and packages for building REST APIs with JSON payloads
+- Short time frame to build a prototype
 
-```
-A, C, E, D, L, U, G, *, E, *, H, T, G, A, F, K
-```
+To elaborate further, despite being given 2 weeks for this assignment, I feel that there is a need to build as quickly as possible. This is in addition to other commitments (e.g school) which does not allow me to work on this assignment alone full-time (unlike a full-time job). Hence, I placed higher emphasis on speed and execution.
 
-This is equivalent to the board:
+## Assumptions
 
-```
-A C E D
-L U G *
-E * H T
-G A F K
-```
+I am working under certain assumptions and constraints:
 
-Some sample words from this board are ace, dug, eight, hole, huge, hug, tide.
+- Single player
+- API responses in the range of milliseconds are acceptable for the user
+- Database has to be local
 
-## Requirement
+I am making the assumption that this game of boggle can be played by anyone by simply starting the backend server and playing via a HTTP client. Hence,I decided to use a local database which will start up when the user starts the backend server. The user will not have to worry about hosting/starting up a database remotely whenever he wishes to play this game, saving him time and resources (no need to pay for any remote hosting).
 
-- Implement an API in the language/framework of you choice,
-that lets user play a single-player game of Boggle.
-- All responses of the API endpoints should be in JSON format.
-- The API endpoints will be following:
+I decided to use SQLite as it is file-based, allowing us to do local storage. Furthermore, according to the requirements, this is for a single-player game of boggle, which means that we do not have to deal with a large number of concurrent users attempting to write to the database, making SQLite suitable as well.
 
-### Create the game
+## Approach
 
-- Endpoint
+Node.js does not have a fixed architecture for organising files, giving us the flexibility to design according to our needs.
 
-```
-POST /games
-```
+High level breakdown of file organisation:
 
-- Parameters:
-  + `duration` (required): the time (in seconds) that specifies the duration of
-    the game
-  + `random` (required): if `true`, then the game will be generated with random
-    board.  Otherwise, it will be generated based on input.
-  + `board` (optional): if `random` is not true, this will be used as the board
-    for new game. If this is not present, new game will get the default board
-    from `test_board.txt`
+- boggle
 
-- Response:
-  + Success (status 201 Created)
+  - index
+  - boggle API
+  - database
+  - game
 
-```json
-{
-  "id": 1,
-  "token": "9dda26ec7e476fb337cb158e7d31ac6c",
-  "duration": 12345,
-  "board": "A, C, E, D, L, U, G, *, E, *, H, T, G, A, F, K"
-}
-```
+## boggle/index.js
 
-### Play the game
+This will be the entry point. All backend server related code goes here.
 
-- Endpoint
+## boggle/boggleAPI
 
-```
-PUT /games/:id
-```
+The API routes can technically be lumped together with the server code. However, I separated them due to separation of concerns and extensibility (in the event that the server has to provide other end points for non-boggle related features).
 
-- Parameters:
-  + `id` (required): The ID of the game
-  + `token` (required): The token for authenticating the game
-  + `word` (required): The word that can be used to play the game
+## boggle/database
 
-- Response:
-  + Success (status 200 OK)
+All database related code goes here - initialization, connection and read/write/update/delete operations.
 
-```json
-{
-  "id": 1,
-  "token": "9dda26ec7e476fb337cb158e7d31ac6c",
-  "duration": 12345,
-  "board": "A, C, E, D, L, U, G, *, E, *, H, T, G, A, F, K",
-  "time_left": 10000,
-  "points": 10
-}
-```
+## boggle/game
 
-### Show the game
+Each route will call a high-level method from boggle/game/index.js. All error handling and logic will be done here. Utility methods used to abstract the game logic will be placed separately in another utility file.
 
-- Endpoint
+## Testing Approach
 
-```
-GET /games/:id
-```
+I only did manual testing via playing using Postman, no test code was written. Tested scenarios are listed below with their respective message that was sent back in the response.
 
-- Parameters:
-  + `id` (required): The ID of the game
+- (POST) Create the Game
 
-- Response:
-  + Success (status 200 OK)
+  - correct ID in URI, all parameters given
 
-```json
-{
-  "id": 1,
-  "token": "9dda26ec7e476fb337cb158e7d31ac6c",
-  "duration": 12345,
-  "board": "A, C, E, D, L, U, G, *, E, *, H, T, G, A, F, K",
-  "time_left": 10000,
-  "points": 10
-}
-```
+    - duration, random=true
+    - duration, random=false, no custom board
+    - duration, random=false, custom board
 
-## Testing
+  - correct ID in URI, missing parameters -- (message: 'Required parameters missing.')
+    - missing duration
+    - missing random
 
-- We provide a set of integration test so that you can try it with your
-solution. You can add more tests, but you shouldn't modify the current test,
-because we will use it to validate your code. The test suite is not an
-exhaustive set, so your code can still fail even if you pass all the tests.
+- (PUT) Play the Game
 
-### How to run test
+  - correct ID in URI, all parameters given
+    - valid token, correct & legal word, not expired
+  - correct ID in URI, invalid word given -- (message: 'Invalid move/word given')
 
-- Install ruby
+    - valid token, incorrect & legal word, not expired
+    - valid token, correct & illegal word, not expired
+    - valid token, incorrect & illegal word, not expired
 
-- Install gem:
+  - correct ID in URI, invalid token given -- (message: 'Authentication failed. Incorrect token provided.')
+  - correct ID, all parameters given, game expired -- (message: 'Game has expired')
 
-```
-bundle install
-```
+  - correct ID in URI, missing parameters -- (message: 'Required parameters missing.')
 
-- Edit `.env` file and replace sample `SERVER_URL` with your server url
-- Run test:
+    - missing token
+    - missing word
 
-```
-rspec
-```
+  - incorrect ID in URI -- (message: 'Invalid ID provided. Game not exist.')
 
-## Submitting the solution
+- (GET) Show the Game
+  - correct ID in URI
+  - incorrect ID in URI -- (message: 'Requested game not found.')
 
-- Send us your solution whenever you’re done.
-- There should be a short README explaining your solution and how to setup the
-project from scratch.
+## Instructions
 
-## What we care about
+- Install node
+- Install npm
+- Install packages
 
-- We're interested in your method and how you approach the problem just as much as we're interested in the end result.
-It would be nice if you can show us how you tackled it, why you chose the approach you did, etc.
+  ```
+  cd ./boggle
+  npm install
+  ```
 
-- That said, here's what you should aim for with your code:
+- Create .env file using template provided at ./boggle/.env.template
+- Start backend server
 
-  - Clean, readable, **production quality code**; would we want to work with your code as part of a bigger codebase?
-  - Good modelling and design decisions (ex: if you use multithread solution, is your code thread-safe?).
-  - Extensible code; adding features will be another exercise when you come back.
-  - Good use of your programming language idioms.
-  - Solid testing approach _(this is not compulsory, though)_
+  ```
+  cd ./boggle
+  node index.js
+  ```
 
-We haven't hidden any nasty tricks in the test. Don't overthink it. Just write nice, solid code.
+- Play game via HTTP client (e.g Postman)
+
+## Things to Note
+
+As the assignment requires production quality code, I feel that there is a need to explain certain coding style/decisions.
+
+For this, I loosely followed the AirBnb Javascript style guide.
+
+Personally, I prefer to be more verbose when it comes to naming my variables. This is to allow the next developer to be able to get up to speed as fast as possible and reduce ambiguity of intepretation. As a result, the variable names may be longer than what most people usually use.
+
+For the case of if-else vs ternary operators, I prefer to use the ternary operator only for simple logic situations. Otherwise, I prefer to use if-else for longer, nested blocks of logic (inserting comments where appropriate).
+
+## Additional Information
+
+There are some slight differences from the actual Boggle game.
+
+- Points are awarded according to the length of the word, instead of the actual tiered Boggle scoring system.
+- The PUT route for playing the game will return the accumulated score for that particular game, not the score for that word.
+- There is no 'Qu' character in this version.
+- There is a wildcard character denoted by '\*'.
