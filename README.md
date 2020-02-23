@@ -115,7 +115,18 @@ I only did manual testing via playing using Postman, no test code was written. T
   npm install
   ```
 
-- Create .env file using template provided at ./boggle/.env.template
+- Create .env file using template provided at ./boggle/.
+  env.template
+
+  ```
+    e.g
+
+    PORT=3000
+    NODE_ENV='development'
+    DATABASE_FILE_DEVELOPMENT='sample.db'
+    DATABASE_FILE_PRODUCTION='actual.db'
+  ```
+
 - Start backend server
 
   ```
